@@ -4,16 +4,27 @@ go:
 - 1.5
 - 1.6
 - tip
+matrix:
+  allow_failures:
+    - go: 1.5
+  fast_finish: true
+addons:
+  apt:
+    packages:
+      - upx-ucl
 before_install:
 - export PATH=$GOPATH/bin:$PATH
 - set -o pipefail
 install:
-- echo $(pwd)
 - go get -d ./...
 script:
-- echo $(pwd)
 - go test -v ./...
-- go install ./...
+- go install -ldflags="-s -w" ./...
+- echo -e "hoge\nfuga\n" | travis-fold
+- echo -e "hoge\nhoge\n" | travis-fold -n custom-name
+- echo -e "hoge\nhoge\n" | travis-fold -p custom-prefix
+- echo -e "hoge\nhoge\n" | travis-fold -p custom-layout -l 150405
+- upx -9 -v $GOPATH/bin/travis-fold
 - echo -e "hoge\nfuga\n" | travis-fold
 - echo -e "hoge\nhoge\n" | travis-fold -n custom-name
 - echo -e "hoge\nhoge\n" | travis-fold -p custom-prefix
@@ -22,8 +33,10 @@ deploy:
   provider: releases
   api_key:
     secure: ND+Sy8tl3PdNjBWKlEs0cI46mrBzFBUySdMwqOfetDlvvdATylVHQVj1sB+2lDHvreNO1X+alTEZNSj9hFCPIDQF0QrW1uQ3trhc5vV+rnFjKo+Yq+1mLORN4AOskFM69aMz4Ig6mcBwDt/OwvQM/BtLwKkyJA1x1nVfcxxj1kqs83v8D9MgTvpwqpF9pfDu1fIU666KqofihPf9kqYfuuPjLTjGrs4oixL3OzLqNUwNwh/umx0bgWzD0otswQzSQ6SDcXMBClmOiOpeKFH1jofma0M2Ao0kMKgz/jXcA2sZrhUTeJlK9ny/vbeGlbkJ9L1JaBdsvo9a+FLmKpuOy14v2q+pYlKG8AmqBLZB68e+DiXbk4dyVSV25lNJGUZMPpvng0KQoiuGjVmJpd+E3PiINAKR1SwkWxXxXd5fPKhWK64PzGgKadMC5OXXs57bzABi3TtLgaWbjKPYZDVD4mDApq5cpSsIB7JP/GeCYZt4zC5wZ5rYxralfDfRzFyE2U8iFRVeiXMvQOuXR9JSc0chqyOj0XILgaBr7RjsG7l/ljcEMdb/fNeb5/AKxCyKarrnQSNWqAL99gLW4u2A/e9B9vBBr4UJpkHjF0w2MbjEPgVEmmX/rgMvBK8I1LmA/Kz60tFxajj6WQGy6jjQh3JNwSgkIeDOQVBp67Uuvok=
-  file: $GOPATH/bin/travis-fold
+  file:
+    - $GOPATH/bin/travis-fold
   skip_cleanup: true
   on:
     repo: furushchev/travis-fold
     tags: true
+    go: 1.6
